@@ -9,14 +9,16 @@
 <body>
     <header>
         <h1>Stock Management System</h1>
+        {% if session.get('username') %}
         <nav>
-            <a href="/">Inicio</a>
+            <a href="/home">Inicio</a>
             <a href="/productos">Productos</a>
             <a href="/movimientos">Movimientos</a>
             <a href="/prediccion">Predicción</a>
+            <a href="{{ url_for('main.logout') }}">Cerrar sesión</a>
         </nav>
+        {% endif %}
     </header>
-
     <main>
         {% block content %}
         {% endblock %}
