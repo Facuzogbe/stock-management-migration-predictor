@@ -1,0 +1,29 @@
+<!-- app/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Stock Management{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Stock Management System</h1>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/productos">Productos</a>
+            <a href="/movimientos">Movimientos</a>
+            <a href="/prediccion">Predicción</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Plataforma de Stock</p>
+    </footer>
+</body>
+</html>
