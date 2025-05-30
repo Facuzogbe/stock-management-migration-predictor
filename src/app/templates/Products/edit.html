@@ -1,0 +1,45 @@
+<!-- templates/products/edit.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Editar Producto {{ product.product_id }}</title>
+</head>
+<body>
+    <h1>Editar Producto {{ product.product_id }}</h1>
+    <form action="{{ url_for('product.edit_product', product_id=product.product_id) }}" method="POST">
+        <label>ID:</label><br>
+        <input type="text" name="product_id" value="{{ product.product_id }}" readonly><br>
+
+        <label>Nombre:</label><br>
+        <input type="text" name="product_name" value="{{ product.product_name }}" required><br>
+
+        <label>SKU:</label><br>
+        <input type="text" name="sku" value="{{ product.sku }}" required><br>
+
+        <label>Unidad de medida:</label><br>
+        <input type="text" name="unit_of_measure" value="{{ product.unit_of_measure }}" required><br>
+
+        <label>Costo:</label><br>
+        <input type="number" step="0.01" name="cost" value="{{ product.cost }}" required><br>
+
+        <label>Precio de venta:</label><br>
+        <input type="number" step="0.01" name="sale_price" value="{{ product.sale_price }}" required><br>
+
+        <label>Categoría:</label><br>
+        <input type="text" name="category" value="{{ product.category }}" required><br>
+
+        <label>Ubicación:</label><br>
+        <input type="text" name="location" value="{{ product.location }}" required><br>
+
+        <label>Activo:</label><br>
+        <select name="active">
+            <option value="True" {% if product.active %}selected{% endif %}>Sí</option>
+            <option value="False" {% if not product.active %}selected{% endif %}>No</option>
+        </select><br><br>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    <a href="{{ url_for('product.list_products') }}">Volver a la lista</a>
+</body>
+</html>
