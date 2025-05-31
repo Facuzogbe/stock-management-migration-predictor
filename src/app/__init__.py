@@ -1,19 +1,25 @@
-# app/__init__.py
-
 from flask import Flask
-from datetime import timedelta
+from models import db
+from app.routes.main_routes import main_bp
+from app.routes.product_routes import product_bp
+from app.routes.movimientos_routes import movimientos_bp
+from app.routes.preddicion_routes import prediccion_bp
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static")
 
-    # Clave secreta para sesiones
-    app.secret_key = "supersecreto"
+    app.secret_key = "supersecretkey"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///stock.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # ⏳ Establecer duración de la sesión a 30 minutos
-    app.permanent_session_lifetime = timedelta(minutes=2)
+    db.init_app(app)
 
-    # Registrar el blueprint
-    from .routes.main_routes import main_bp
+    with app.app_context():
+        db.create_all()
+
     app.register_blueprint(main_bp)
+    app.register_blueprint(product_bp, url_prefix="/products")
+    app.register_blueprint(movimientos_bp, url_prefix="/movimientos")
+    app.register_blueprint(prediccion_bp, url_prefix="/prediccion")
 
     return app

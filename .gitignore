@@ -1,6 +1,24 @@
+# Entorno virtual de Python
 venv/
+.env/
+
+# Archivos de caché de Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-.env
+
+# Base de datos SQLite
+stock.db
+instance/stock.db
+
+# Archivos de log o temporales
+*.log
+*.tmp
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración locales (opcional)
+*.sqlite3

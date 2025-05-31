@@ -26,7 +26,7 @@ def login():
         else:
             error = "Credenciales incorrectas. Intentalo de nuevo."
 
-    return render_template("login.html", error=error)
+    return render_template("login/login.html", error=error)
 
 # 🔒 Ruta protegida
 @main_bp.route("/home")
