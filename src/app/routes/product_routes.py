@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models import db, Product
+from src.models import db, ProductMasterData as Product
 
 product_bp = Blueprint("product", __name__, template_folder="../templates")
 

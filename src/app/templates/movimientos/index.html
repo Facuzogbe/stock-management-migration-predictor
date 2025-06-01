@@ -4,6 +4,46 @@
 {% block title %}Movimientos{% endblock %}
 
 {% block content %}
-<h2>Sección Movimientos</h2>
-<p>Esta sección estará disponible próximamente.</p>
+<h2>Historial de Movimientos</h2>
+<a href="{{ url_for('movimientos.nuevo_movimiento') }}">Registrar nuevo movimiento</a>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Orden</th>
+            <th>Notas</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mov in movimientos %}
+        <tr>
+            <td>{{ mov.movement_id }}</td>
+            <td>{{ mov.date.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ mov.product.product_name if mov.product else '' }} ({{ mov.product_id }})</td>
+            <td>{{ mov.movement_type }}</td>
+            <td>{{ mov.quantity }}</td>
+            <td>{{ mov.order_id or '' }}</td>
+            <td>{{ mov.notes or '' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+  
+  <a href="{{ url_for('movimientos.nuevo_movimiento') }}" class="btn btn-primary mt-3">Registrar nuevo movimiento</a>
+  
 {% endblock %}
