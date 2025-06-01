@@ -1,0 +1,57 @@
+<!-- src/app/templates/movimientos/nuevo.html -->
+{% extends "base.html" %}
+
+{% block title %}Nuevo Movimiento{% endblock %}
+
+{% block content %}
+<h2>Registrar Movimiento</h2>
+
+<a href="{{ url_for('movimientos.index') }}">← Volver al listado</a>
+
+<form method="POST" action="{{ url_for('movimientos.nuevo_movimiento') }}">
+    <div class="mb-3">
+      <label for="producto_id" class="form-label">Producto:</label>
+      <select name="producto_id" id="producto_id" class="form-select" required>
+        {% for producto in productos %}
+          <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  
+    <div class="mb-3">
+      <label for="tipo" class="form-label">Tipo de movimiento:</label>
+      <select name="tipo" id="tipo" class="form-select" required>
+        <option value="entrada">Entrada</option>
+        <option value="salida">Salida</option>
+      </select>
+    </div>
+  
+    <div class="mb-3">
+      <label for="cantidad" class="form-label">Cantidad:</label>
+      <input type="number" name="cantidad" id="cantidad" class="form-control" required min="1" />
+    </div>
+  
+    <button type="submit" class="btn btn-success">Registrar</button>
+  </form>
+  
+  <a href="{{ url_for('movimientos.index') }}" class="btn btn-secondary mt-3">← Volver al listado</a>
+  
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+        <ul>
+          {% for p in productos %}
+              <li>{{ p.id }} - {{ p.nombre }}</li>
+          {% else %}
+              <li>No hay productos disponibles</li>
+          {% endfor %}
+      </ul>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

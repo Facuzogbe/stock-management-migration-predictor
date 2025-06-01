@@ -14,3 +14,5 @@ class Product(db.Model):
     category = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
+    stock = db.Column(db.Integer, default=0)
+
