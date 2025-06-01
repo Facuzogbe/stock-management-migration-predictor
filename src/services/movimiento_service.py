@@ -36,4 +36,4 @@ def registrar_movimiento(producto_id, tipo, cantidad):
 
 # Obtener todos los movimientos (historial)
 def obtener_movimientos():
-    return Movimiento.query.order_by(Movimiento.fecha.desc()).all()
+    return Movimiento.query.options(db.joinedload(Movimiento.producto)).order_by(Movimiento.id.desc()).all()
