@@ -1,0 +1,67 @@
+
+{% extends "base.html" %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Nuevo Producto</h1>
+
+    <form method="POST" class="row g-3">
+
+        <div class="col-md-4">
+            <label for="product_id" class="form-label">ID del Producto</label>
+            <input type="text" name="product_id" id="product_id" class="form-control" required>
+        </div>
+
+        <div class="col-md-4">
+            <label for="product_name" class="form-label">Nombre</label>
+            <input type="text" name="product_name" id="product_name" class="form-control" required>
+        </div>
+
+        <div class="col-md-4">
+            <label for="sku" class="form-label">SKU</label>
+            <input type="text" name="sku" id="sku" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <label for="unit_of_measure" class="form-label">Unidad</label>
+            <input type="text" name="unit_of_measure" id="unit_of_measure" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <label for="cost" class="form-label">Costo</label>
+            <input type="number" name="cost" id="cost" step="0.01" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <label for="sale_price" class="form-label">Precio Venta</label>
+            <input type="number" name="sale_price" id="sale_price" step="0.01" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <label for="category" class="form-label">Categoría</label>
+            <input type="text" name="category" id="category" class="form-control" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="location" class="form-label">Ubicación</label>
+            <input type="text" name="location" id="location" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check">
+                <input type="checkbox" name="active" id="active" class="form-check-input" checked>
+                <label for="active" class="form-check-label">Activo</label>
+            </div>
+        </div>
+
+        <div class="col-12 d-flex justify-content-between mt-4">
+            <a href="{{ url_for('product.list_products') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-success">Guardar Producto</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
