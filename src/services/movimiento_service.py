@@ -1,39 +1,86 @@
-# services/movimiento_service.py
+# src/services/movimiento_service.py
 
 from datetime import datetime
-from models import db
-from models.stock_model import Product  # Modelo correcto
-from models.movimiento_model import Movimiento
+from sqlalchemy import func
+from src.extensions import db
+from src.models.product_master_data import ProductMasterData as Product
+from src.models.inventory_movement_data import InventoryMovementData as Movimiento
+from src.models.current_stock_data import CurrentStockData
 
-# Registrar movimiento: entrada o salida
-def registrar_movimiento(producto_id, tipo, cantidad):
-    producto = Product.query.get(producto_id)
+# Definimos los tipos de movimiento válidos según la consigna
+VALID_MOVEMENT_TYPES = {
+    'INBOUND': 'Entrada de inventario',
+    'OUTBOUND': 'Salida de inventario',
+    'ADJUSTMENT_IN': 'Ajuste positivo',
+    'ADJUSTMENT_OUT': 'Ajuste negativo'
+}
 
+def registrar_movimiento(product_id, movement_type, quantity, order_id=None, notes=None):
+    """
+    Registra un movimiento de inventario con validación completa
+    
+    Args:
+        product_id (str): ID del producto (ej: P001)
+        movement_type (str): Tipo de movimiento (debe estar en VALID_MOVEMENT_TYPES)
+        quantity (int): Cantidad de unidades (debe ser positivo)
+        order_id (str, optional): ID de orden relacionada
+        notes (str, optional): Notas adicionales
+        
+    Returns:
+        Movimiento: El movimiento registrado
+        
+    Raises:
+        ValueError: Con mensajes descriptivos para cada tipo de error
+    """
+    # Validación del tipo de movimiento
+    if movement_type not in VALID_MOVEMENT_TYPES:
+        valid_types = ", ".join(VALID_MOVEMENT_TYPES.keys())
+        raise ValueError(f"Tipo de movimiento inválido. Use uno de: {valid_types}")
+
+    # Validación de cantidad positiva
+    if not isinstance(quantity, int) or quantity <= 0:
+        raise ValueError("La cantidad debe ser un número entero positivo")
+
+    # Verificar producto existente
+    producto = Product.query.get(product_id)
     if not producto:
-        raise ValueError("Producto no encontrado.")
+        raise ValueError(f"Producto con ID {product_id} no encontrado")
 
-    if tipo == "salida":
-        if producto.stock < cantidad:
-            raise ValueError("Stock insuficiente para realizar la salida.")
-        producto.stock -= cantidad
+    # Generar ID automático para el movimiento
+    last_movement = Movimiento.query.order_by(Movimiento.movement_id.desc()).first()
+    new_id = f"M{(int(last_movement.movement_id[1:]) + 1):03d}" if last_movement else "M001"
 
-    elif tipo == "entrada":
-        producto.stock += cantidad
+    # Validación especial para movimientos de salida
+    if movement_type in ['OUTBOUND', 'ADJUSTMENT_OUT']:
+        stock_actual = CurrentStockData.query.get(product_id)
+        if not stock_actual or stock_actual.quantity < quantity:
+            raise ValueError(
+                f"Stock insuficiente. Disponible: {stock_actual.quantity if stock_actual else 0}, "
+                f"Se requieren: {quantity}"
+            )
 
-    else:
-        raise ValueError("Tipo de movimiento no válido. Use 'entrada' o 'salida'.")
-
+    # Crear y guardar el movimiento
     movimiento = Movimiento(
-        producto_id=producto_id,
-        tipo=tipo,
-        cantidad=cantidad,
-        fecha=datetime.now()
+        movement_id=new_id,
+        product_id=product_id,
+        movement_type=movement_type,
+        quantity=quantity,
+        order_id=order_id,
+        notes=notes,
+        date=datetime.utcnow()
     )
 
     db.session.add(movimiento)
     db.session.commit()
+    
     return movimiento
 
-# Obtener todos los movimientos (historial)
+def obtener_tipos_movimiento():
+    """Devuelve los tipos de movimiento válidos con sus descripciones"""
+    return VALID_MOVEMENT_TYPES
+
 def obtener_movimientos():
-    return Movimiento.query.options(db.joinedload(Movimiento.producto)).order_by(Movimiento.id.desc()).all()
+    """Obtiene todos los movimientos ordenados por fecha descendente"""
+    return (db.session.query(Movimiento)
+            .order_by(Movimiento.date.desc())
+            .all())

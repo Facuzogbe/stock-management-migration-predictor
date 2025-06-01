@@ -1,8 +1,6 @@
-# src/main.py
-from app import create_app  # usa la de __init__.py, que tiene static_folder bien puesto
+from src.app import create_app
 
 app = create_app()
 
-if __name__ == "__main__":
-    print(app.url_map)  # debug
+if __name__ == '__main__':
     app.run(debug=True)

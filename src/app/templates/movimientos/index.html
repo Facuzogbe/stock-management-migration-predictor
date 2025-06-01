@@ -18,38 +18,30 @@
 {% endwith %}
 
 <table class="table">
-  <thead>
-      <tr>
-          <th>ID</th>  <!-- Nueva columna -->
-          <th>Fecha</th>
-          <th>Producto</th>
-          <th>Tipo</th>
-          <th>Cantidad</th>
-      </tr>
-  </thead>
-  <tbody>
-      {% for movimiento in movimientos %}
-      <tr>
-          <td>{{ movimiento.id }}</td>  <!-- Muestra el ID autogenerado -->
-          <td>{{ movimiento.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
-          <td>
-              {% if movimiento.producto %}
-                  {{ movimiento.producto.product_name }} ({{ movimiento.producto.sku }})
-              {% else %}
-                  <span class="text-danger">Producto eliminado</span>
-              {% endif %}
-          </td>
-          <td>
-              {% if movimiento.tipo == 'entrada' %}
-                  <span class="badge bg-success">Entrada</span>
-              {% else %}
-                  <span class="badge bg-danger">Salida</span>
-              {% endif %}
-          </td>
-          <td>{{ movimiento.cantidad }}</td>
-      </tr>
-      {% endfor %}
-  </tbody>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Orden</th>
+            <th>Notas</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mov in movimientos %}
+        <tr>
+            <td>{{ mov.movement_id }}</td>
+            <td>{{ mov.date.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ mov.product.product_name if mov.product else '' }} ({{ mov.product_id }})</td>
+            <td>{{ mov.movement_type }}</td>
+            <td>{{ mov.quantity }}</td>
+            <td>{{ mov.order_id or '' }}</td>
+            <td>{{ mov.notes or '' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
   
   <a href="{{ url_for('movimientos.nuevo_movimiento') }}" class="btn btn-primary mt-3">Registrar nuevo movimiento</a>
