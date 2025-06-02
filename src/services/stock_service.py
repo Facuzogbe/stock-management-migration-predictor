@@ -1,17 +1,15 @@
-# src/services/stock_service.py
-from datetime import datetime
 from src.extensions import db
-from src.models.current_stock_data import CurrentStockData
-from src.models.product_master_data import ProductMasterData
+from src.models import CurrentStockData, ProductMasterData
 
-def actualizar_stock(product_id, movement_type, quantity):
-    """
-    Actualiza el stock después de un movimiento
-    Args:
-        product_id (str): ID del producto
-        movement_type (str): Tipo de movimiento
-        quantity (int): Cantidad a ajustar
-    """
+def obtener_stock_actual():
+    """Obtiene todo el stock actual con información de productos"""
+    return db.session.query(CurrentStockData)\
+        .join(ProductMasterData)\
+        .order_by(ProductMasterData.product_name)\
+        .all()
+
+def update_stock(product_id, movement_type, quantity):
+    """Actualiza el stock después de un movimiento"""
     stock = CurrentStockData.query.get(product_id)
     producto = ProductMasterData.query.get(product_id)
     
@@ -28,4 +26,4 @@ def actualizar_stock(product_id, movement_type, quantity):
         stock.total_inventory_cost = stock.quantity * producto.cost
     
     stock.last_updated = datetime.utcnow()
-    db.session.commit()
+    db.session.commit() 
