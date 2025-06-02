@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Stock Actual</h2>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Id Producto</th>
+                <th>Producto</th>
+                <th>Stock</th>
+                <th>Ultima Actualizacion</th>
+                <th>Costo total de inventario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in stock_data %}
+            <tr>
+                <td>{{ item.product_id }}</td>
+                <td>{{ item.product.product_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.last_updated.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>${{ "%.2f"|format(item.total_inventory_cost) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
