@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template
-from src.models.current_stock_data import CurrentStock
-from src.models.product_master_data import ProductMasterData
+from src.services.stock_service import obtener_stock_actual
 
-bp = Blueprint('stock', __name__, url_prefix='/stock')
+stock_bp = Blueprint('stock', __name__, template_folder='../templates/stock')
 
-@bp.route('/')
-def stock_dashboard():
-    stock_data = CurrentStock.query.join(ProductMasterData).all()
-    return render_template('stock/dashboard.html', stock_data=stock_data)
+@stock_bp.route('/')
+def index():
+    stock_data = obtener_stock_actual()
+    return render_template('stock/index.html', stock_data=stock_data) 

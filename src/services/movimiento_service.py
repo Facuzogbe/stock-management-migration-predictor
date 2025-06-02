@@ -17,7 +17,7 @@ VALID_MOVEMENT_TYPES = {
 
 def registrar_movimiento(product_id, movement_type, quantity, order_id=None, notes=None):
     """
-    Registra un movimiento de inventario con validación completa
+    Registra un movimiento de inventario con validación completa y actualización de stock
     
     Args:
         product_id (str): ID del producto (ej: P001)
@@ -59,7 +59,7 @@ def registrar_movimiento(product_id, movement_type, quantity, order_id=None, not
                 f"Se requieren: {quantity}"
             )
 
-    # Crear y guardar el movimiento
+    # Crear el movimiento
     movimiento = Movimiento(
         movement_id=new_id,
         product_id=product_id,
@@ -70,10 +70,35 @@ def registrar_movimiento(product_id, movement_type, quantity, order_id=None, not
         date=datetime.utcnow()
     )
 
+    # Actualizar el stock (versión mejorada)
+    actualizar_stock_directo(product_id, movement_type, quantity, producto.cost)
+
     db.session.add(movimiento)
     db.session.commit()
     
     return movimiento
+
+def actualizar_stock_directo(product_id, movement_type, quantity, unit_cost):
+    """
+    Función interna para actualizar el stock directamente
+    """
+    stock = CurrentStockData.query.get(product_id)
+    
+    if not stock:
+        stock = CurrentStockData(
+            product_id=product_id,
+            quantity=0,
+            total_inventory_cost=0
+        )
+        db.session.add(stock)
+    
+    if movement_type in ['INBOUND', 'ADJUSTMENT_IN']:
+        stock.quantity += quantity
+    else:
+        stock.quantity -= quantity
+    
+    stock.total_inventory_cost = stock.quantity * unit_cost
+    stock.last_updated = datetime.utcnow()
 
 def obtener_tipos_movimiento():
     """Devuelve los tipos de movimiento válidos con sus descripciones"""
@@ -83,4 +108,4 @@ def obtener_movimientos():
     """Obtiene todos los movimientos ordenados por fecha descendente"""
     return (db.session.query(Movimiento)
             .order_by(Movimiento.date.desc())
-            .all())
+            .all()) 
