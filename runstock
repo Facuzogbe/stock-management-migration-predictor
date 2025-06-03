@@ -13,11 +13,11 @@ echo -e "${CYAN}"
 echo "   _____ _             _    __  __                                   "
 echo "  / ____| |           | |  |  \/  |                                  "
 echo " | (___ | |_ ___   ___| | _| \  / | __ _ _ __   __ _  __ _  ___ _ __ "
-echo "  \___ \| _/ _ \ / __| |/ / |\/| |/ _\` | ' \ / \` |/ _\` |/ _ \ '_|"
-echo "  ___) | || () | (|   <| |  | | (| | | | | (| | (_| |  __/ |   "
-echo " |/ \\/ \||\\|  ||\,|| ||\,|\, |\|_|   "
+echo "  \___ \| __/ _ \ / __| |/ / |\/| |/ _\` | '_ \ / _\` |/ _\` |/ _ \ '__|"
+echo "  ____) | || (_) | (__|   <| |  | | (_| | | | | (_| | (_| |  __/ |   "
+echo " |_____/ \__\___/ \___|_|\_\_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|   "
 echo "                                                       __/ |          "
-echo "                                                      |_/           "
+echo "                                                      |___/           "
 echo -e "${NC}"
 
 # Configuración del entorno
@@ -26,8 +26,8 @@ export FLASK_ENV=development
 export PYTHONPATH=.
 
 # Información del sistema
-echo -e "${YELLOW}⚙  Configuración inicial${NC}"
-echo -e "${GREEN}🖥  Sistema:${NC} $(uname -srm)"
+echo -e "${YELLOW}⚙️  Configuración inicial${NC}"
+echo -e "${GREEN}🖥️  Sistema:${NC} $(uname -srm)"
 echo -e "${GREEN}🐍 Python:${NC} $(python3 --version | cut -d' ' -f2)"
 echo -e "${GREEN}📦 Entorno virtual:${NC} ${VIRTUAL_ENV:-No activo}"
 echo -e "${GREEN}📂 Directorio:${NC} $(pwd)"
@@ -45,4 +45,4 @@ echo -e "\n${BLUE}🚀 Iniciando StockManager...${NC}"
 echo -e "${CYAN}🌐 Servidor Flask disponible en: http://127.0.0.1:5000/${NC}"
 echo -e "${YELLOW}🛑 Presiona Ctrl+C para detener la aplicación${NC}\n"
 
-python3 src/main.py 
+python3 src/main.py
