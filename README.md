@@ -47,13 +47,7 @@ This project includes a script `env.sh` that creates a local alias called `runst
 
 ### What does the alias do?
 
-The alias `runstock` executes the command:
-
-```bash
-
-source env.sh
-
-python src/main.py
+The alias `./runstock` executes the command:
 
 
 
