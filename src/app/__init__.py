@@ -1,10 +1,10 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from src.extensions import db  # Importa db desde extensions
 from .routes.stock_routes import stock_bp
 
 def create_app():
-    app = Flask(__name__, static_folder="static", instance_relative_config=True)
+    app = Flask(_name_, static_folder="static", instance_relative_config=True)
     
     # Configuración básica
     app.secret_key = "supersecretkey"
@@ -29,5 +29,12 @@ def create_app():
         
         # Crear tablas si no existen
         db.create_all()
-    
-    return app 
+
+    # ⛔ Manejador para error 403
+    @app.errorhandler(403)
+    def forbidden_error(e):
+        return render_template("errors/403.html"), 403
+
+    return app
+
+
