@@ -1,10 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
+from app.utils.auth_decorators import role_required
 
-main_bp = Blueprint("main", __name__)
+
+main_bp = Blueprint("main", _name_)
 
 # Usuario de prueba
 USER_DATA = {
-    "admin": "stock2025"
+    "Admin": {"password": "stock2025", "role": "admin"},
+    "Gerente": {"password": "stock2025", "role": "gerente"},
+    "Empleado": {"password": "stock2025", "role": "empleado"},
 }
 
 # 🟢 Ruta principal: login (si no estás logueado) o redirige a /home
@@ -19,9 +23,10 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        if username in USER_DATA and USER_DATA[username] == password:
-            session.permanent = True  # ✅ Activa el tiempo de sesión definido en __init__.py
+        if username in USER_DATA and USER_DATA[username]["password"] == password:
+            session.permanent = True  # ✅ Activa el tiempo de sesión definido en _init_.py
             session["username"] = username
+            session["role"] = USER_DATA[username]["role"]
             return redirect(url_for("main.home"))
         else:
             error = "Credenciales incorrectas. Intentalo de nuevo."

@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from app.utils.auth_decorators import role_required
+
 from src.services.movimiento_service import (
     obtener_movimientos, 
     registrar_movimiento,
@@ -8,15 +10,19 @@ from src.services.movimiento_service import (
 from src.models import db, ProductMasterData as Product
 from sqlalchemy.exc import SQLAlchemyError
 
-movimientos_bp = Blueprint('movimientos', __name__, template_folder='../templates/movimientos')
+movimientos_bp = Blueprint('movimientos', _name_, template_folder='../templates/movimientos')
 
 @movimientos_bp.route('/', methods=['GET'])
+@role_required(["admin", "empleado"])
+
 def index():
     """Muestra todos los movimientos de inventario"""
     movimientos = obtener_movimientos()
     return render_template('movimientos/index.html', movimientos=movimientos)
 
 @movimientos_bp.route('/nuevo', methods=['GET', 'POST'])
+@role_required(["admin", "empleado"])
+
 def nuevo_movimiento():
     """Registra un nuevo movimiento de inventario"""
     # Obtener datos para el formulario
