@@ -1,14 +1,20 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from src.models import db, ProductMasterData as Product
+from app.utils.auth_decorators import role_required
+
 
 product_bp = Blueprint("product", __name__, template_folder="../templates")
 
 @product_bp.route("/")
+@role_required(["admin", "empleado"])
+
 def list_products():
     products = Product.query.all()
     return render_template("products/list.html", products=products)
 
 @product_bp.route("/new", methods=["GET", "POST"])
+@role_required(["admin", "empleado"])
+
 def new_product():
     if request.method == "POST":
         data = request.form
@@ -31,6 +37,8 @@ def new_product():
     return render_template("products/new.html")
 
 @product_bp.route("/edit/<product_id>", methods=["GET", "POST"])
+@role_required(["admin", "empleado"])
+
 def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
 
@@ -52,6 +60,8 @@ def edit_product(product_id):
     return render_template("products/edit.html", product=product)
 
 @product_bp.route("/delete/<product_id>", methods=["POST"])
+@role_required(["admin", "empleado"])
+
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)

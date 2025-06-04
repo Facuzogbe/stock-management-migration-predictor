@@ -27,10 +27,19 @@ https://fonts.googleapis.com/css2?family=Roboto&display=swap
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('product.list_products') }}">Productos</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('movimientos.index') }}">Movimientos</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('stock.index') }}">Stock Actual</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('prediccion.index') }}">Predicción</a></li>
+    
+                {% if session.get('role') in ['admin', 'empleado'] %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('product.list_products') }}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('movimientos.index') }}">Movimientos</a></li>
+                {% endif %}
+    
+                {% if session.get('role') in ['gerente', 'admin', 'empleado'] %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('stock.index') }}">Stock Actual</a></li>
+                {% endif %}
+    
+                {% if session.get('role') in ['gerente', 'admin'] %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('prediccion.index') }}">Predicción</a></li>
+                {% endif %}
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
@@ -43,7 +52,8 @@ https://fonts.googleapis.com/css2?family=Roboto&display=swap
                 </li>
             </ul>
         </div>
-        {% endif %}
+    {% endif %}
+    
     </div>
 </nav>
 
