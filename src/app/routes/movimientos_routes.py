@@ -10,7 +10,7 @@ from src.services.movimiento_service import (
 from src.models import db, ProductMasterData as Product
 from sqlalchemy.exc import SQLAlchemyError
 
-movimientos_bp = Blueprint('movimientos', _name_, template_folder='../templates/movimientos')
+movimientos_bp = Blueprint('movimientos', __name__, template_folder='../templates/movimientos')
 
 @movimientos_bp.route('/', methods=['GET'])
 @role_required(["admin", "empleado"])

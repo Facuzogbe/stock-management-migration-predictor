@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from app.utils.auth_decorators import role_required
 
 
-main_bp = Blueprint("main", _name_)
+main_bp = Blueprint("main", __name__)
 
 # Usuario de prueba
 USER_DATA = {

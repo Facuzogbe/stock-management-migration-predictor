@@ -3,7 +3,7 @@ from src.models import db, ProductMasterData as Product
 from app.utils.auth_decorators import role_required
 
 
-product_bp = Blueprint("product", _name_, template_folder="../templates")
+product_bp = Blueprint("product", __name__, template_folder="../templates")
 
 @product_bp.route("/")
 @role_required(["admin", "empleado"])

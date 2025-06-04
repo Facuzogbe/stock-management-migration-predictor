@@ -4,7 +4,7 @@ from src.extensions import db  # Importa db desde extensions
 from .routes.stock_routes import stock_bp
 
 def create_app():
-    app = Flask(_name_, static_folder="static", instance_relative_config=True)
+    app = Flask(__name__, static_folder="static", instance_relative_config=True)
     
     # Configuración básica
     app.secret_key = "supersecretkey"
