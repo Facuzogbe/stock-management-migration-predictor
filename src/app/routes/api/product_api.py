@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from src.models import db, ProductMasterData as Product
 
-product_api_bp = Blueprint("product_api", _name_, url_prefix="/api/products")
+product_api_bp = Blueprint("product_api", __name__, url_prefix="/api/products")
 
 
 # GET - Obtener todos los productos

@@ -6,7 +6,7 @@ class PredictorStockData(db.Model):
     """
     Datos históricos para entrenar el modelo predictivo de stock
     """
-    _tablename_ = 'predictor_stock_data'
+    __tablename__ = 'predictor_stock_data'
 
     # Campos principales
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +26,7 @@ class PredictorStockData(db.Model):
     # Relación explícita con Producto
     product = relationship("ProductMasterData", back_populates="predictions")
 
-    def _repr_(self):
+    def __repr__(self):
         return f'<Prediction Data {self.date}: {self.product_id} - Sold {self.units_sold}>'
 
     def to_dict(self):

@@ -2,8 +2,8 @@ from sqlalchemy.orm import relationship
 from src.models import db
 
 class ProductMasterData(db.Model):
-    _tablename_ = 'product_master_data'
-    _table_args_ = {'extend_existing': True}
+    __tablename__ = 'product_master_data'
+    __table_args__ = {'extend_existing': True}
 
     product_id = db.Column(db.String(10), primary_key=True)
     product_name = db.Column(db.String(100), nullable=False)
@@ -19,7 +19,7 @@ class ProductMasterData(db.Model):
     movements = relationship("InventoryMovementData", back_populates="product", cascade="all, delete", passive_deletes=True)
     predictions = relationship("PredictorStockData", back_populates="product", cascade="all, delete", passive_deletes=True)
 
-    def _repr_(self):
+    def __repr__(self):
         return f'<Product {self.product_id}: {self.product_name}>'
 
     def to_dict(self):
