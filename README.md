@@ -41,21 +41,12 @@ This is an academic project for the *Advanced Programming* course (2025), focuse
 
 ---
 
-## Local Alias to Run the Application
+## 🚀 Running the Application
 
-This project includes a script `env.sh` that creates a local alias called `runstock`.
+### Using the runstock script:
 
-### What does the alias do?
+1.First, make the script executable:
+   `chmod +x runstock`
 
-The alias `runstock` executes the command:
-
-```bash
-python src/main.py
-
-
-
-> This repository is collaborative and public for educational purposes. Only invited members can push code.
-
-
-
-
+2.Then start the application:
+`./runstock`
