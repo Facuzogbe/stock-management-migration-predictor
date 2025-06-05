@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template
 from src.extensions import db  # Importa db desde extensions
+from app.routes.api.product_api import product_api_bp
 from .routes.stock_routes import stock_bp
 
 def create_app():
@@ -26,7 +27,8 @@ def create_app():
         app.register_blueprint(movimientos_bp, url_prefix="/movimientos")
         app.register_blueprint(stock_bp, url_prefix='/stock')
         app.register_blueprint(prediccion_bp, url_prefix="/prediccion")
-        
+        app.register_blueprint(product_api_bp)
+
         # Crear tablas si no existen
         db.create_all()
 

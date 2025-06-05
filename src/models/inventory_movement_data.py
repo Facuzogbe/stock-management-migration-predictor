@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy.orm import relationship
 from src.models import db
 
 class InventoryMovementData(db.Model):
@@ -10,14 +11,20 @@ class InventoryMovementData(db.Model):
     # Campos principales
     movement_id = db.Column(db.String(10), primary_key=True)  # Ej: M001, M002
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    product_id = db.Column(db.String(10), db.ForeignKey('product_master_data.product_id'), nullable=False)
+
+    product_id = db.Column(
+        db.String(10),
+        db.ForeignKey('product_master_data.product_id', ondelete="CASCADE"),
+        nullable=False
+    )
+
     movement_type = db.Column(db.String(20), nullable=False)  # INBOUND, OUTBOUND, ADJUSTMENT
     quantity = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.String(20))  # PO-1001 (compra), SO-2001 (venta), ADJ-001 (ajuste)
     notes = db.Column(db.Text)  # Notas adicionales
 
-    # Relación con Producto
-    product = db.relationship('ProductMasterData', backref='movements')
+    # Relación explícita con producto
+    product = relationship("ProductMasterData", back_populates="movements")
 
     # Tipos de movimiento permitidos
     MOVEMENT_TYPES = {

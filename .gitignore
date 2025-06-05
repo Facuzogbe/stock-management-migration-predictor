@@ -9,8 +9,7 @@ __pycache__/
 *.pyd
 
 # Base de datos SQLite
-stock.db
-instance/stock.db
+# instance/stock.db
 
 # Archivos de log o temporales
 *.log
