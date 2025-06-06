@@ -50,3 +50,6 @@ This is an academic project for the *Advanced Programming* course (2025), focuse
 
 2.Then start the application:
 `./runstock`
+
+3. script for create date test
+`python src/scripts/datos_ficticios.py`
