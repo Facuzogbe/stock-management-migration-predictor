@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.utils.auth_decorators import role_required
+from ..utils.auth_decorators import role_required
 
 from src.services.movimiento_service import (
     obtener_movimientos, 
