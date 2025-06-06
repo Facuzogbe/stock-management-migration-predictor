@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Análisis Predictivo</h2>
+    
+    {% if grafico_url %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4>Gráfico Predictivo</h4>
+        </div>
+        <div class="card-body">
+            <img src="{{ url_for('static', filename=grafico_url) }}" 
+                 alt="Gráfico Predictivo" 
+                 class="img-fluid">
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-4">
+        No hay datos suficientes para generar el gráfico predictivo
+    </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <button class="btn btn-primary" onclick="actualizarGrafico()">
+            Actualizar Gráfico
+        </button>
+    </div>
+</div>
+
+<script>
+function actualizarGrafico() {
+    // Recarga la página para regenerar el gráfico
+    window.location.reload();
+}
+</script>
+{% endblock %}

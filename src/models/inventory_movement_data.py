@@ -20,7 +20,7 @@ class InventoryMovementData(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.String(20))  # PO-1001 (compra), SO-2001 (venta), ADJ-001 (ajuste)
     notes = db.Column(db.Text)  # Notas adicionales
-    movement_date = db.Column(db.DateTime)  # <-- ESTA ES LA QUE TE FALTA USAR
+    movement_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Con nullable y default
 
 
     # Relación explícita con producto
