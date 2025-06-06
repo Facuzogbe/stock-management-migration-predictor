@@ -52,4 +52,8 @@ This is an academic project for the *Advanced Programming* course (2025), focuse
 `./runstock`
 
 3. script for create date test
-`python src/scripts/datos_ficticios.py`
+`python src/scripts/seed_db.py`
+
+4. script delete and update table
+`python src/scripts/reset_db.py`
+
