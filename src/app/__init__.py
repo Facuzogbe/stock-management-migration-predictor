@@ -1,11 +1,14 @@
 import os
 from flask import Flask, render_template
 from src.extensions import db  # Importa db desde extensions
-from app.routes.api.product_api import product_api_bp
+from .routes.api.product_api import product_api_bp 
 from .routes.stock_routes import stock_bp
 
 def create_app():
     app = Flask(__name__, static_folder="static", instance_relative_config=True)
+    
+    os.makedirs(app.instance_path, exist_ok=True)  # <--- Línea clave recien agregada
+
     
     # Configuración básica
     app.secret_key = "supersecretkey"
@@ -17,16 +20,16 @@ def create_app():
     
     # Importar y registrar blueprints dentro del contexto de la aplicación
     with app.app_context():
-        from app.routes.main_routes import main_bp
-        from app.routes.product_routes import product_bp
-        from app.routes.movimientos_routes import movimientos_bp
-        from app.routes.preddicion_routes import prediccion_bp
+        from .routes.main_routes import main_bp                       
+        from .routes.product_routes import product_bp                 
+        from .routes.movimientos_routes import movimientos_bp         
+        from .routes.predictor_routes import predictor_bp
         
         app.register_blueprint(main_bp)
         app.register_blueprint(product_bp, url_prefix="/products")
         app.register_blueprint(movimientos_bp, url_prefix="/movimientos")
         app.register_blueprint(stock_bp, url_prefix='/stock')
-        app.register_blueprint(prediccion_bp, url_prefix="/prediccion")
+        app.register_blueprint(predictor_bp, url_prefix="/predictor")
         app.register_blueprint(product_api_bp)
 
         # Crear tablas si no existen
