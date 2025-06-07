@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from src.services.predictor import generar_grafico_predictivo
+from src.services.predictor_service import generar_grafico_predictivo
 from ..utils.auth_decorators import role_required
 
 predictor_bp = Blueprint('predictor', __name__, url_prefix='/predictor')
