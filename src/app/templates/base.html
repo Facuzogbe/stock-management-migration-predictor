@@ -38,7 +38,7 @@ https://fonts.googleapis.com/css2?family=Roboto&display=swap
                 {% endif %}
     
                 {% if session.get('role') in ['gerente', 'admin'] %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('prediccion.index') }}">Predicción</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('predictor.index') }}">Predicción</a></li>
                 {% endif %}
             </ul>
             <ul class="navbar-nav">

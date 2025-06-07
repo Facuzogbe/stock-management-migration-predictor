@@ -7,7 +7,7 @@ class ProductMasterData(db.Model):
 
     product_id = db.Column(db.String(10), primary_key=True)
     product_name = db.Column(db.String(100), nullable=False)
-    sku = db.Column(db.String(50), unique=True, nullable=False)
+    sku = db.Column(db.String(20), nullable=False)  # ⚠️ Este campo es obligatorio
     unit_of_measure = db.Column(db.String(20), default='Unit')
     cost = db.Column(db.Float, nullable=False)
     sale_price = db.Column(db.Float, nullable=False)
