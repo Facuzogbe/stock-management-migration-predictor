@@ -4,143 +4,164 @@ from datetime import datetime, timedelta
 import random
 from flask import Flask
 
-# Configura el path correctamente
+# Configuración
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
 from src.extensions import db
-from src.models.inventory_movement_data import InventoryMovementData
-from src.models.product_master_data import ProductMasterData
+from src.models import InventoryMovementData, ProductMasterData, CurrentStockData
+from src.services.movimiento_service import registrar_movimiento
 
 def create_app():
     app = Flask(__name__, static_folder="static", instance_relative_config=True)
     from src.app import create_app as real_app
     return real_app()
 
-def load_sample_data():
-    print("Cargando datos de productos reales...")
+def generar_historico_realista():
+    print("Generando histórico realista 2023-2025...")
     
-    # 1. Reiniciar la base de datos (solo en desarrollo)
     with app.app_context():
+        # 1. Limpiar y preparar BD
         db.drop_all()
         db.create_all()
-    
-    # 2. Crear productos reales (modificado con tus datos JSON)
-    real_products = [
-        {
+        
+        # 2. Crear producto de prueba
+        producto = {
             'product_id': "P001",
-            'product_name': "Dell XPS 13 Laptop",
-            'sku': "DELL-XPS13",
+            'product_name': "Laptop Business Pro",
+            'sku': "LT-BP-2023",
             'category': "Electronics",
+            'cost': 1350.0,
+            'sale_price': 1899.0,
             'unit_of_measure': "Unit",
-            'cost': 1200.0,
-            'sale_price': 1600.0,
-            'location': "A1-01",
-            'active': True
-        },
-        {
-            'product_id': "P002",
-            'product_name': "LG UltraWide Monitor",
-            'sku': "LG-UW34",
-            'category': "Electronics",
-            'unit_of_measure': "Unit",
-            'cost': 350.0,
-            'sale_price': 450.0,
-            'location': "A1-02",
-            'active': True
-        },
-        {
-            'product_id': "P003",
-            'product_name': "RGB Mechanical Keyboard",
-            'sku': "KM-RGB01",
-            'category': "Peripherals",
-            'unit_of_measure': "Unit",
-            'cost': 80.0,
-            'sale_price': 120.0,
-            'location': "B2-05",
-            'active': True
-        },
-        {
-            'product_id': "P004",
-            'product_name': "Logitech Gaming Mouse",
-            'sku': "LOGI-G502",
-            'category': "Peripherals",
-            'unit_of_measure': "Unit",
-            'cost': 50.0,
-            'sale_price': 75.0,
-            'location': "B2-06",
-            'active': True
-        },
-        {
-            'product_id': "P005",
-            'product_name': "HDMI Cable 2m",
-            'sku': "HDMI-2M",
-            'category': "Accessories",
-            'unit_of_measure': "Unit",
-            'cost': 5.0,
-            'sale_price': 10.0,
-            'location': "C3-10",
             'active': True
         }
-    ]
-    
-    try:
-        # Insertar productos
-        for product_data in real_products:
-            if not db.session.get(ProductMasterData, product_data['product_id']):
-                producto = ProductMasterData(**product_data)
-                db.session.add(producto)
+        
+        db.session.add(ProductMasterData(**producto))
+        db.session.add(CurrentStockData(
+            product_id=producto['product_id'],
+            quantity=40,
+            total_inventory_cost=40 * producto['cost']
+        ))
         db.session.commit()
-        print(f"✅ Se cargaron {len(real_products)} productos reales.")
         
-        # 3. Crear movimientos de inventario para estos productos
-        fecha_inicio = datetime.now() - timedelta(weeks=104)
-        movimientos = []
+        # 3. Configuración de período histórico
+        fecha_inicio = datetime(2023, 1, 1)
+        fecha_fin = datetime(2025, 6, 6)  # Fecha actual
+        rango_dias = (fecha_fin - fecha_inicio).days
         
-        for i in range(104):
-            # Seleccionar producto aleatorio de los reales
-            product = random.choice(real_products)
-            product_id = product['product_id']
-            
-            # Generar fecha progresiva
-            movement_date = fecha_inicio + timedelta(weeks=i)
-            
-            # Determinar tipo de movimiento
-            movement_type = random.choice(['INBOUND', 'OUTBOUND', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT'])
-            
-            # Cantidad basada en el tipo de producto
-            base_qty = 1 if product['category'] == "Electronics" else (5 if product['category'] == "Peripherals" else 10)
-            quantity = random.randint(base_qty, base_qty * 3)
-            
-            movimientos.append({
-                'date': movement_date,
-                'product_id': product_id,
-                'movement_type': movement_type,
-                'quantity': quantity,
-                'order_id': f"{'PO' if movement_type == 'INBOUND' else 'SO'}-{1000+i}",
-                'notes': f"Movimiento para {product['product_name']}",
-                'movement_date': movement_date
-            })
-
-        db.session.bulk_insert_mappings(InventoryMovementData, movimientos)
-        db.session.commit()
-        print(f"✅ Se cargaron {len(movimientos)} movimientos con movement_date.")
+        # 4. Generación de movimientos con distribución temporal real
+        movimientos_generados = 0
+        stock_actual = 40
         
-        # Verificación
-        print("\nEjemplo de productos cargados:")
-        for prod in ProductMasterData.query.limit(3).all():
-            print(f"ID: {prod.product_id} | Nombre: {prod.product_name} | Precio: {prod.sale_price}")
+        # Generar aproximadamente 2-3 movimientos por semana
+        total_movimientos = int(rango_dias / 3 * 2.5)
+        
+        for i in range(total_movimientos):
+            # Fecha aleatoria dentro del rango
+            dias_aleatorios = random.randint(0, rango_dias)
+            fecha_movimiento = fecha_inicio + timedelta(days=dias_aleatorios)
             
-        print("\nEjemplo de movimientos cargados:")
-        for mov in InventoryMovementData.query.limit(3).all():
-            print(f"ID: {mov.movement_id} | Producto: {mov.product_id} | Tipo: {mov.movement_type} | Cantidad: {mov.quantity}")
+            # Hora aleatoria del día
+            fecha_movimiento = fecha_movimiento.replace(
+                hour=random.randint(8, 18),  # Horario comercial
+                minute=random.randint(0, 59),
+                second=random.randint(0, 59)
+            )
             
-    except Exception as e:
-        db.session.rollback()
-        print(f"❌ Error: {str(e)}")
-        raise e
+            # Determinar tipo de movimiento (60% entrada, 40% salida)
+            if random.random() < 0.6 or stock_actual < 15:
+                movimiento_tipo = 'INBOUND'
+                cantidad = random.randint(5, 20)
+                stock_actual += cantidad
+                notas = f"Compra a proveedor - {cantidad} unidades"
+            else:
+                movimiento_tipo = 'OUTBOUND'
+                max_posible = min(10, stock_actual)
+                cantidad = random.randint(1, max_posible)
+                stock_actual -= cantidad
+                notas = f"Venta a cliente - {cantidad} unidades"
+            
+            # Registrar movimiento (sin pasar date y movement_date)
+            try:
+                # Crear movimiento directamente para poder asignar fechas manuales
+                movimiento = InventoryMovementData(
+                    movement_id=f"MOV-{fecha_movimiento.strftime('%Y%m%d%H%M%S')}",
+                    product_id=producto['product_id'],
+                    movement_type=movimiento_tipo,
+                    quantity=cantidad,
+                    order_id=f"{movimiento_tipo[:2]}-{fecha_movimiento.strftime('%Y%m%d%H%M')}",
+                    notes=notas,
+                    date=fecha_movimiento,
+                    movement_date=fecha_movimiento
+                )
+                db.session.add(movimiento)
+                
+                # Actualizar stock manualmente
+                stock = CurrentStockData.query.get(producto['product_id'])
+                if movimiento_tipo == 'INBOUND':
+                    stock.quantity += cantidad
+                else:
+                    stock.quantity -= cantidad
+                stock.total_inventory_cost = stock.quantity * producto['cost']
+                stock.last_updated = datetime.utcnow()
+                
+                db.session.commit()
+                movimientos_generados += 1
+                
+                # 25% de probabilidad de movimiento adicional cercano
+                if random.random() < 0.25:
+                    fecha_extra = fecha_movimiento + timedelta(hours=random.randint(1, 6))
+                    tipo_extra = 'INBOUND' if random.random() < 0.7 else 'OUTBOUND'
+                    cantidad_extra = random.randint(1, 5)
+                    
+                    movimiento_extra = InventoryMovementData(
+                        movement_id=f"MOV-{fecha_extra.strftime('%Y%m%d%H%M%S')}",
+                        product_id=producto['product_id'],
+                        movement_type=tipo_extra,
+                        quantity=cantidad_extra,
+                        order_id=f"{tipo_extra[:2]}-EXTRA-{fecha_extra.strftime('%Y%m%d%H%M')}",
+                        notes="Movimiento adicional por ajuste de inventario",
+                        date=fecha_extra,
+                        movement_date=fecha_extra
+                    )
+                    db.session.add(movimiento_extra)
+                    
+                    # Actualizar stock
+                    if tipo_extra == 'INBOUND':
+                        stock.quantity += cantidad_extra
+                    else:
+                        stock.quantity -= cantidad_extra
+                    stock.total_inventory_cost = stock.quantity * producto['cost']
+                    stock.last_updated = datetime.utcnow()
+                    
+                    db.session.commit()
+                    movimientos_generados += 1
+                    
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error en movimiento {i}: {str(e)}")
+                continue
+        
+        # 5. Resultados y verificación
+        print(f"\n✅ Histórico generado: {movimientos_generados} movimientos entre {fecha_inicio.date()} y {fecha_fin.date()}")
+        print(f"Stock final: {stock_actual} unidades")
+        
+        # Verificar que hay movimientos antes de intentar acceder a ellos
+        primer_movimiento = InventoryMovementData.query.order_by(InventoryMovementData.date.asc()).first()
+        ultimo_movimiento = InventoryMovementData.query.order_by(InventoryMovementData.date.desc()).first()
+        
+        if primer_movimiento and ultimo_movimiento:
+            print(f"\nPrimer movimiento: {primer_movimiento.date} | Último movimiento: {ultimo_movimiento.date}")
+            
+            # Mostrar algunos movimientos de ejemplo
+            print("\nEjemplos de movimientos generados:")
+            for mov in InventoryMovementData.query.order_by(db.func.random()).limit(5).all():
+                print(f"{mov.date} | {mov.movement_type} | {mov.quantity} unidades | {mov.notes}")
+        else:
+            print("\n⚠️ No se generaron movimientos. Verifica los errores anteriores.")
 
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        load_sample_data()
+        generar_historico_realista()
