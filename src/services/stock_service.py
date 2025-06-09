@@ -1,3 +1,4 @@
+import datetime 
 from src.extensions import db
 from src.models import CurrentStockData, ProductMasterData
 
@@ -25,5 +26,5 @@ def update_stock(product_id, movement_type, quantity):
     if producto:
         stock.total_inventory_cost = stock.quantity * producto.cost
     
-    stock.last_updated = datetime.utcnow()
-    db.session.commit() 
+    stock.last_updated = datetime.datetime.utcnow()
+    db.session.commit()
