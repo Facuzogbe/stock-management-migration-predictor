@@ -1,16 +1,16 @@
-# setup.py
-import sys
-import os
+from setuptools import setup, find_packages
 
-# Aseguramos que src esté en el path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
-
-from src.app import create_app
-from src.models.product_master_data import db
-
-app = create_app()
-
-with app.app_context():
-    db.drop_all()
-    db.create_all()
-    print("✅ Base de datos recreada correctamente.")
+setup(
+    name="stock_manager",
+    version="0.1",
+    package_dir={"": "src"},  # Indica que los paquetes están en src/
+    packages=find_packages(where="src"),  # Busca paquetes en src/
+    install_requires=[
+        "flask",
+        "flask-sqlalchemy",
+        "pandas",
+        "scikit-learn",
+        "statsmodels",
+    ],
+    python_requires=">=3.9",
+)
