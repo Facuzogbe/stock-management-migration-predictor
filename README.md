@@ -57,3 +57,6 @@ This is an academic project for the *Advanced Programming* course (2025), focuse
 4. script delete and update table
 `python src/scripts/reset_db.py`
 
+5. script for run test
+`ppytest --cov=src src/tests/`
+

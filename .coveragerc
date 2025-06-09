@@ -1,0 +1,11 @@
+[run]
+omit =
+    */__init__.py
+    src/app/static/*
+    src/config.py
+    src/extensions.py
+    */tests/*
+    */migrations/*
+    */venv/*
+    [run]  
+    src/main.py  
