@@ -7,6 +7,9 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+/stock_manager.egg-info/
+*.egg-info/
+
 
 # Base de datos SQLite
 # instance/stock.db
