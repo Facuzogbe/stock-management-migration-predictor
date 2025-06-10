@@ -7,10 +7,12 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+/stock_manager.egg-info/
+*.egg-info/
+
 
 # Base de datos SQLite
-stock.db
-instance/stock.db
+# instance/stock.db
 
 # Archivos de log o temporales
 *.log

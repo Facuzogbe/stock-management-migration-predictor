@@ -1,5 +1,3 @@
-# src/services/movimiento_service.py
-
 from datetime import datetime
 from sqlalchemy import func
 from src.extensions import db
@@ -32,73 +30,137 @@ def registrar_movimiento(product_id, movement_type, quantity, order_id=None, not
     Raises:
         ValueError: Con mensajes descriptivos para cada tipo de error
     """
-    # Validación del tipo de movimiento
-    if movement_type not in VALID_MOVEMENT_TYPES:
-        valid_types = ", ".join(VALID_MOVEMENT_TYPES.keys())
-        raise ValueError(f"Tipo de movimiento inválido. Use uno de: {valid_types}")
+    try:
+        # Validación del tipo de movimiento
+        if movement_type not in VALID_MOVEMENT_TYPES:
+            valid_types = ", ".join(VALID_MOVEMENT_TYPES.keys())
+            raise ValueError(f"Tipo de movimiento inválido. Use uno de: {valid_types}")
 
-    # Validación de cantidad positiva
-    if not isinstance(quantity, int) or quantity <= 0:
-        raise ValueError("La cantidad debe ser un número entero positivo")
+        # Validación de cantidad positiva
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                raise ValueError("La cantidad debe ser un número entero positivo")
+        except (ValueError, TypeError):
+            raise ValueError("La cantidad debe ser un número válido")
 
-    # Verificar producto existente
-    producto = Product.query.get(product_id)
-    if not producto:
-        raise ValueError(f"Producto con ID {product_id} no encontrado")
+        # Verificar producto existente
+        producto = Product.query.get(product_id)
+        if not producto:
+            raise ValueError(f"Producto con ID {product_id} no encontrado")
 
-    # Generar ID automático para el movimiento
-    last_movement = Movimiento.query.order_by(Movimiento.movement_id.desc()).first()
-    new_id = f"M{(int(last_movement.movement_id[1:]) + 1):03d}" if last_movement else "M001"
+        # Generar ID automático para el movimiento
+        last_movement = Movimiento.query.order_by(Movimiento.movement_id.desc()).first()
+        new_id = f"M{(int(last_movement.movement_id[1:]) + 1):03d}" if last_movement else "M001"
 
-    # Validación especial para movimientos de salida
-    if movement_type in ['OUTBOUND', 'ADJUSTMENT_OUT']:
-        stock_actual = CurrentStockData.query.get(product_id)
-        if not stock_actual or stock_actual.quantity < quantity:
-            raise ValueError(
-                f"Stock insuficiente. Disponible: {stock_actual.quantity if stock_actual else 0}, "
-                f"Se requieren: {quantity}"
-            )
+        # Validación especial para movimientos de salida
+        if movement_type in ['OUTBOUND', 'ADJUSTMENT_OUT']:
+            stock_actual = CurrentStockData.query.get(product_id)
+            if not stock_actual or stock_actual.quantity < quantity:
+                raise ValueError(
+                    f"Stock insuficiente. Disponible: {stock_actual.quantity if stock_actual else 0}, "
+                    f"Se requieren: {quantity}"
+                )
 
-    # Crear el movimiento
-    movimiento = Movimiento(
-        movement_id=new_id,
-        product_id=product_id,
-        movement_type=movement_type,
-        quantity=quantity,
-        order_id=order_id,
-        notes=notes,
-        date=datetime.utcnow()
-    )
+        # Crear el movimiento con conversión explícita de tipos
+        now = datetime.utcnow()
+        movimiento = Movimiento(
+            movement_id=str(new_id),
+            product_id=str(product_id),
+            movement_type=str(movement_type),
+            quantity=int(quantity),
+            order_id=str(order_id) if order_id else None,
+            notes=str(notes) if notes else None,
+            date=now,
+            movement_date=now
+        )
 
-    # Actualizar el stock (versión mejorada)
-    actualizar_stock_directo(product_id, movement_type, quantity, producto.cost)
+        # Iniciar transacción
+        db.session.begin_nested()
+        
+        try:
+            # Actualizar el stock
+            stock = CurrentStockData.query.get(product_id)
+            
+            if not stock:
+                stock = CurrentStockData(
+                    product_id=str(product_id),
+                    quantity=0,
+                    total_inventory_cost=0.0
+                )
+                db.session.add(stock)
+            
+            # Calcular nuevo stock con validación
+            if movement_type in ['INBOUND', 'ADJUSTMENT_IN']:
+                stock.quantity += quantity
+            else:
+                new_quantity = stock.quantity - quantity
+                if new_quantity < 0:
+                    raise ValueError("No hay suficiente stock disponible")
+                stock.quantity = new_quantity
+            
+            # Actualizar costos
+            stock.total_inventory_cost = float(stock.quantity) * float(producto.cost)
+            stock.last_updated = now
+            
+            # Registrar movimiento y confirmar transacción
+            db.session.add(movimiento)
+            db.session.commit()
+            
+            return movimiento
 
-    db.session.add(movimiento)
-    db.session.commit()
-    
-    return movimiento
+        except Exception as e:
+            db.session.rollback()
+            raise ValueError(f"Error en transacción: {str(e)}")
+
+    except ValueError as e:
+        db.session.rollback()
+        raise ValueError(str(e))
+    except Exception as e:
+        db.session.rollback()
+        raise ValueError(f"Error inesperado: {str(e)}")
 
 def actualizar_stock_directo(product_id, movement_type, quantity, unit_cost):
     """
-    Función interna para actualizar el stock directamente
+    Función mejorada para actualizar el stock directamente
     """
-    stock = CurrentStockData.query.get(product_id)
-    
-    if not stock:
-        stock = CurrentStockData(
-            product_id=product_id,
-            quantity=0,
-            total_inventory_cost=0
-        )
-        db.session.add(stock)
-    
-    if movement_type in ['INBOUND', 'ADJUSTMENT_IN']:
-        stock.quantity += quantity
-    else:
-        stock.quantity -= quantity
-    
-    stock.total_inventory_cost = stock.quantity * unit_cost
-    stock.last_updated = datetime.utcnow()
+    try:
+        # Convertir tipos de entrada
+        product_id = str(product_id)
+        quantity = int(quantity)
+        unit_cost = float(unit_cost)
+
+        # Iniciar transacción
+        db.session.begin_nested()
+        
+        stock = CurrentStockData.query.get(product_id)
+        
+        if not stock:
+            stock = CurrentStockData(
+                product_id=product_id,
+                quantity=0,
+                total_inventory_cost=0.0
+            )
+            db.session.add(stock)
+        
+        # Calcular nuevo stock con validación
+        if movement_type in ['INBOUND', 'ADJUSTMENT_IN']:
+            stock.quantity += quantity
+        else:
+            new_quantity = stock.quantity - quantity
+            if new_quantity < 0:
+                raise ValueError("No hay suficiente stock disponible")
+            stock.quantity = new_quantity
+        
+        # Actualizar valores con conversión explícita
+        stock.total_inventory_cost = float(stock.quantity) * unit_cost
+        stock.last_updated = datetime.utcnow()
+        
+        db.session.commit()
+        
+    except Exception as e:
+        db.session.rollback()
+        raise ValueError(f"Error en actualización de stock: {str(e)}")
 
 def obtener_tipos_movimiento():
     """Devuelve los tipos de movimiento válidos con sus descripciones"""
@@ -108,4 +170,4 @@ def obtener_movimientos():
     """Obtiene todos los movimientos ordenados por fecha descendente"""
     return (db.session.query(Movimiento)
             .order_by(Movimiento.date.desc())
-            .all()) 
+            .all())

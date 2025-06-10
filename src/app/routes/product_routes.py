@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from src.models import db, ProductMasterData as Product
-from app.utils.auth_decorators import role_required
+from ..utils.auth_decorators import role_required
 
 
 product_bp = Blueprint("product", __name__, template_folder="../templates")

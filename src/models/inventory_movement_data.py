@@ -1,23 +1,21 @@
 from datetime import datetime
+from sqlalchemy.orm import relationship
 from src.models import db
 
 class InventoryMovementData(db.Model):
-    """
-    Registra todos los movimientos de entrada/salida/ajuste de inventario
-    """
     __tablename__ = 'inventory_movement_data'
-
-    # Campos principales
-    movement_id = db.Column(db.String(10), primary_key=True)  # Ej: M001, M002
+    
+    movement_id = db.Column(db.String(10), primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     product_id = db.Column(db.String(10), db.ForeignKey('product_master_data.product_id'), nullable=False)
-    movement_type = db.Column(db.String(20), nullable=False)  # INBOUND, OUTBOUND, ADJUSTMENT
+    movement_type = db.Column(db.String(20), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    order_id = db.Column(db.String(20))  # PO-1001 (compra), SO-2001 (venta), ADJ-001 (ajuste)
-    notes = db.Column(db.Text)  # Notas adicionales
+    order_id = db.Column(db.String(20))
+    notes = db.Column(db.Text)
+    movement_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # Relación con Producto
-    product = db.relationship('ProductMasterData', backref='movements')
+    # Relación explícita con producto
+    product = relationship("ProductMasterData", back_populates="movements")
 
     # Tipos de movimiento permitidos
     MOVEMENT_TYPES = {

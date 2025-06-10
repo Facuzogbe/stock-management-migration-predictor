@@ -1,4 +1,5 @@
 from datetime import date
+from sqlalchemy.orm import relationship
 from src.models import db
 
 class PredictorStockData(db.Model):
@@ -10,14 +11,20 @@ class PredictorStockData(db.Model):
     # Campos principales
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)  # Fecha del registro histórico
-    product_id = db.Column(db.String(10), db.ForeignKey('product_master_data.product_id'), nullable=False)
+
+    product_id = db.Column(
+        db.String(10),
+        db.ForeignKey('product_master_data.product_id', ondelete="CASCADE"),
+        nullable=False
+    )
+
     units_sold = db.Column(db.Integer, nullable=False)  # Unidades vendidas ese día
     avg_sale_price = db.Column(db.Float)  # Precio promedio de venta
     promotion_active = db.Column(db.Boolean, default=False)  # ¿Hubo promoción?
     special_event = db.Column(db.String(100))  # Evento especial (ej: "New Year's Day")
 
-    # Relación con Producto
-    product = db.relationship('ProductMasterData', backref='predictions')
+    # Relación explícita con Producto
+    product = relationship("ProductMasterData", back_populates="predictions")
 
     def __repr__(self):
         return f'<Prediction Data {self.date}: {self.product_id} - Sold {self.units_sold}>'

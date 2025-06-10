@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from app.utils.auth_decorators import role_required
-
+from ..utils.auth_decorators import role_required
 
 main_bp = Blueprint("main", __name__)
 
@@ -43,5 +42,5 @@ def home():
 # 🔚 Cierre de sesión
 @main_bp.route("/logout")
 def logout():
-    session.pop("username", None)
+    session.clear()
     return redirect(url_for("main.login"))
