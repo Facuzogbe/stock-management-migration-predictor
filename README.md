@@ -32,7 +32,6 @@ Academic project for the **Advanced Programming** course — *Licenciatura en Te
 - 🧪 **Integrated unit & API testing (Pytest, Postman)**
 - 📊 **Visual dashboards with HTML/Jinja + Charts**
 
-![alt text](image.png)
 
 ---
 
