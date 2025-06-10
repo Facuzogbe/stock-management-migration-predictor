@@ -1,6 +1,8 @@
 # 🧠 Stock Management Migration & Prediction System
 
-Academic project for the **Advanced Programming** course — *Licenciatura en Tecnologías Digitales* (2025).
+Academic project for the **Advanced Programming**
+Degree Program: Bachelor’s Degree in Digital Technologies
+(2025).
 
 🚀 A complete migration of a legacy Java stock system into a modern Python-based web platform, with integrated AI stock prediction, role-based access, and cloud deployment.
 
@@ -57,7 +59,6 @@ Academic project for the **Advanced Programming** course — *Licenciatura en Te
 - SQLAlchemy ORM + scripts for seeding/reset.
 - Basic role-based login simulated via session.
 
-> See full architecture diagram in `/docs/architecture_diagram.png` (optional).
 
 ---
 
