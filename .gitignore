@@ -9,7 +9,7 @@ __pycache__/
 *.pyd
 /stock_manager.egg-info/
 *.egg-info/
-
+htmlcov/
 
 # Base de datos SQLite
 # instance/stock.db
